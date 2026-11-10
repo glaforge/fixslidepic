@@ -23,3 +23,12 @@ Open [http://localhost:8080](http://localhost:8080) in your browser to:
 2. Watch real-time Server-Sent Events (SSE) progress as the ADK `LoopAgent` runs `gemini-nano-banana-2.1` and `gemini-3.8-flash`.
 3. Compare the original camera photo and the restored slide using Side-by-Side view or the interactive Before/After split slider.
 4. Click **Regenerate Slide (Loop Again)** with optional custom instructions to re-enter the `LoopAgent` for another refinement cycle.
+
+## License
+
+This project is licensed under the Apache License, Version 2.0. See the [LICENSE](LICENSE) file for details.
+
+## Disclaimer
+
+This is not an officially supported Google product. This project is not eligible for the [Google Open Source Software Vulnerability Rewards Program](https://bughunters.google.com/open-source-security).
+
