@@ -1,0 +1,2395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#090a0f" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="generator" content="FixSlidePic — gemini-nano-banana-2.1 & gemini-3.8-flash" />
+  <link rel="icon" type="image/png" href="/favicon.png" />
+  <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <title>FixSlidePic</title>
+  <style>
+    :root {
+      --bg: #090a0f;
+      --surface: rgba(255, 255, 255, 0.04);
+      --surface-hover: rgba(255, 255, 255, 0.07);
+      --border: rgba(255, 255, 255, 0.09);
+      --border-strong: rgba(255, 255, 255, 0.18);
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --accent: #38bdf8;
+      --accent-glow: rgba(56, 189, 248, 0.25);
+      --success: #34d399;
+      --target-size: 24px;
+    }
+
+    @media (pointer: coarse) {
+      :root {
+        --target-size: 44px;
+      }
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    [hidden] {
+      display: none !important;
+    }
+
+    img,
+    video {
+      max-inline-size: 100%;
+      block-size: auto;
+    }
+
+    :where(button, input:not([type="checkbox"], [type="radio"]), [role="button"], a.btn) {
+      min-block-size: var(--target-size);
+      min-inline-size: var(--target-size);
+    }
+
+    body {
+      margin: 0;
+      min-block-size: 100dvh;
+      font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background:
+        radial-gradient(circle at 50% -10%, rgba(56, 189, 248, 0.12), transparent 55%),
+        radial-gradient(circle at 85% 90%, rgba(129, 140, 248, 0.08), transparent 45%),
+        var(--bg);
+      color: var(--text);
+      overflow-wrap: anywhere;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding-block-start: max(1rem, env(safe-area-inset-top, 0px));
+      padding-block-end: max(1.5rem, env(safe-area-inset-bottom, 0px));
+      padding-inline-start: max(clamp(0.85rem, 3vw, 2rem), env(safe-area-inset-left, 0px));
+      padding-inline-end: max(clamp(0.85rem, 3vw, 2rem), env(safe-area-inset-right, 0px));
+      gap: clamp(0.75rem, 2vw, 1rem);
+    }
+
+    /* Top Minimal Bar */
+    .topbar {
+      inline-size: 100%;
+      max-inline-size: 1280px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: safe center;
+      justify-content: space-between;
+      gap: 0.65rem 1rem;
+      min-block-size: 42px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      font-weight: 700;
+      font-size: clamp(0.95rem, 0.85rem + 0.4vw, 1.05rem);
+      letter-spacing: -0.02em;
+      user-select: none;
+    }
+
+    .brand-mark {
+      inline-size: 32px;
+      block-size: 32px;
+      flex-shrink: 0;
+      border-radius: 8px;
+      object-fit: cover;
+      display: block;
+      box-shadow: 0 0 18px rgba(56, 189, 248, 0.25);
+    }
+
+    .top-actions {
+      display: flex;
+      flex-wrap: wrap;
+      flex-wrap: balance;
+      align-items: safe center;
+      justify-content: flex-end;
+      gap: 0.5rem;
+      margin-inline-start: auto;
+    }
+
+    .top-actions .btn {
+      padding: 0.45rem 0.95rem;
+      font-size: 0.8rem;
+    }
+
+    /* Wide Hero Stage */
+    .stage-wrapper {
+      inline-size: 100%;
+      max-inline-size: 1280px;
+      position: relative;
+      container: stage / inline-size;
+    }
+
+    .stage {
+      inline-size: 100%;
+      aspect-ratio: 16 / 9;
+      max-block-size: calc(100dvh - 240px);
+      border-radius: clamp(12px, 2vw, 20px);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.7);
+      position: relative;
+      overflow: clip;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: border-color 0.25s ease, background 0.25s ease, box-shadow 0.25s ease;
+    }
+
+    .stage.empty {
+      border: 1.5px dashed var(--border-strong);
+      cursor: pointer;
+    }
+
+    .stage.empty:hover,
+    .stage.dragover {
+      border-color: var(--accent);
+      background: var(--surface-hover);
+      box-shadow: 0 0 0 4px var(--accent-glow), 0 25px 60px -15px rgba(0, 0, 0, 0.7);
+    }
+
+    .stage input[type="file"] {
+      display: none;
+    }
+
+    .upload-prompt {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.75rem;
+      color: var(--text-muted);
+      text-align: center;
+      padding: clamp(1rem, 4cqi, 2rem);
+      pointer-events: none;
+    }
+
+    .upload-icon {
+      inline-size: clamp(44px, 8cqi, 56px);
+      block-size: clamp(44px, 8cqi, 56px);
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border);
+      display: grid;
+      place-items: center;
+      color: var(--accent);
+    }
+
+    .upload-prompt strong {
+      color: var(--text);
+      font-size: clamp(0.9rem, 0.75rem + 1cqi, 1.05rem);
+      font-weight: 600;
+      text-wrap: balance;
+    }
+
+    .stage-image {
+      inline-size: 100%;
+      block-size: 100%;
+      object-fit: contain;
+      display: block;
+      background: #050609;
+      transition: filter 0.35s ease, opacity 0.3s ease;
+    }
+
+    .stage.busy .stage-image {
+      filter: brightness(0.55) blur(3px);
+    }
+
+    /* Floating overlays on the stage */
+    .stage-overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: clamp(1rem, 3cqi, 2.5rem);
+      background: radial-gradient(circle at 50% 45%, rgba(15, 23, 42, 0.55), rgba(5, 6, 9, 0.78));
+      backdrop-filter: blur(10px);
+      z-index: 10;
+    }
+
+    .progress-popup {
+      position: relative;
+      inline-size: min(94%, 560px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: clamp(1rem, 2.2cqi, 1.4rem);
+      padding: clamp(1.35rem, 3.5cqi, 2.25rem) clamp(1.35rem, 4cqi, 2.5rem);
+      border-radius: clamp(20px, 2.5cqi, 28px);
+      background:
+        radial-gradient(120% 100% at 50% 0%, rgba(56, 189, 248, 0.16), transparent 65%),
+        radial-gradient(90% 90% at 85% 100%, rgba(129, 140, 248, 0.12), transparent 60%),
+        rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(56, 189, 248, 0.32);
+      box-shadow:
+        0 28px 70px -12px rgba(0, 0, 0, 0.8),
+        0 0 40px -8px rgba(56, 189, 248, 0.25),
+        inset 0 1px 0 rgba(255, 255, 255, 0.14);
+      color: var(--text);
+      text-align: center;
+      overflow: clip;
+    }
+
+    .progress-hero {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: clamp(0.75rem, 1.6cqi, 1.05rem);
+      inline-size: 100%;
+    }
+
+    .progress-spinner-wrap {
+      position: relative;
+      inline-size: clamp(56px, 8.5cqi, 76px);
+      block-size: clamp(56px, 8.5cqi, 76px);
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(56, 189, 248, 0.16), rgba(56, 189, 248, 0.02) 70%);
+      box-shadow: 0 0 32px rgba(56, 189, 248, 0.28);
+    }
+
+    .progress-spinner-wrap progress.loading-spinner:indeterminate {
+      --size: 100%;
+      --thickness: 4.5px;
+    }
+
+    .progress-spinner-icon {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      color: var(--accent);
+      filter: drop-shadow(0 0 10px rgba(56, 189, 248, 0.5));
+      animation: float-icon 2.2s ease-in-out infinite;
+    }
+
+    .progress-spinner-icon svg {
+      inline-size: clamp(24px, 3.8cqi, 32px);
+      block-size: clamp(24px, 3.8cqi, 32px);
+    }
+
+    @keyframes float-icon {
+      0%, 100% { transform: scale(1); opacity: 0.95; }
+      50% { transform: scale(1.08); opacity: 1; }
+    }
+
+    .progress-badges {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+
+    .progress-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.3rem 0.85rem;
+      border-radius: 999px;
+      font-size: clamp(0.78rem, 0.72rem + 0.3cqi, 0.9rem);
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      background: rgba(56, 189, 248, 0.14);
+      color: #7dd3fc;
+      border: 1px solid rgba(56, 189, 248, 0.35);
+    }
+
+    .progress-badge.secondary {
+      background: rgba(129, 140, 248, 0.14);
+      color: #c7d2fe;
+      border-color: rgba(129, 140, 248, 0.35);
+    }
+
+    .progress-title {
+      margin: 0;
+      font-size: clamp(1.3rem, 1.05rem + 1.3cqi, 1.85rem);
+      font-weight: 800;
+      letter-spacing: -0.025em;
+      line-height: 1.2;
+      background: linear-gradient(135deg, #ffffff 30%, #bae6fd 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .progress-subtitle {
+      margin: 0;
+      font-size: clamp(0.92rem, 0.84rem + 0.45cqi, 1.08rem);
+      line-height: 1.45;
+      color: #cbd5e1;
+      max-inline-size: 44ch;
+      text-wrap: balance;
+    }
+
+    /* Pipeline Steps inside Popup */
+    .progress-steps {
+      inline-size: 100%;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.65rem;
+    }
+
+    @container stage (inline-size < 30rem) {
+      .progress-steps {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .progress-step {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      padding: 0.7rem 0.9rem;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.035);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      text-align: start;
+      transition: all 0.25s ease;
+    }
+
+    .progress-step.active {
+      background: rgba(56, 189, 248, 0.12);
+      border-color: rgba(56, 189, 248, 0.45);
+      box-shadow: 0 0 20px rgba(56, 189, 248, 0.15);
+    }
+
+    .progress-step.done {
+      background: rgba(52, 211, 153, 0.1);
+      border-color: rgba(52, 211, 153, 0.35);
+    }
+
+    .step-indicator {
+      inline-size: 28px;
+      block-size: 28px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      display: grid;
+      place-items: center;
+      font-size: 0.8rem;
+      font-weight: 700;
+      background: rgba(255, 255, 255, 0.07);
+      color: var(--text-muted);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+    }
+
+    .progress-step.active .step-indicator {
+      background: var(--accent);
+      color: #090a0f;
+      border-color: var(--accent);
+      box-shadow: 0 0 12px rgba(56, 189, 248, 0.6);
+    }
+
+    .progress-step.done .step-indicator {
+      background: var(--success);
+      color: #090a0f;
+      border-color: var(--success);
+    }
+
+    .step-meta {
+      display: flex;
+      flex-direction: column;
+      min-inline-size: 0;
+    }
+
+    .step-label {
+      font-size: clamp(0.84rem, 0.78rem + 0.3cqi, 0.96rem);
+      font-weight: 700;
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .step-desc {
+      font-size: clamp(0.72rem, 0.68rem + 0.2cqi, 0.8rem);
+      color: var(--text-muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .progress-step.active .step-desc {
+      color: #7dd3fc;
+    }
+
+    /* Styled <progress> bar (following modern-web-guidance `progress`) */
+    .progress-meter-group {
+      inline-size: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .progress-meter-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+      font-size: clamp(0.78rem, 0.74rem + 0.25cqi, 0.88rem);
+      color: #cbd5e1;
+      font-weight: 600;
+    }
+
+    progress.stage-progress-bar {
+      appearance: none;
+      border: 0 solid;
+      overflow: clip;
+      inline-size: 100%;
+      block-size: 10px;
+      --progress-bar-radius: 1e5px;
+      --progress-bar-track: rgba(255, 255, 255, 0.1);
+      --progress-bar-fill: linear-gradient(90deg, #38bdf8, #818cf8, #34d399);
+      border-radius: var(--progress-bar-radius);
+      background: var(--progress-bar-track);
+      box-shadow: inset 0 1px 2px rgb(0 0 0 / 0.35);
+      container-type: inline-size;
+      --progress-bar-indeterminate-size: 35%;
+      --progress-bar-indeterminate-animation-duration: 1.5s;
+
+      @media (prefers-reduced-motion: reduce) {
+        --progress-bar-indeterminate-animation-duration: 10s;
+      }
+    }
+
+    progress.stage-progress-bar:dir(rtl) {
+      --progress-bar-indeterminate-animation: progress-bar-indeterminate var(--progress-bar-indeterminate-animation-duration) infinite linear reverse;
+    }
+
+    progress.stage-progress-bar:indeterminate {
+      --progress-bar-animation: var(
+        --progress-bar-indeterminate-animation,
+        progress-bar-indeterminate var(--progress-bar-indeterminate-animation-duration) infinite linear
+      );
+    }
+
+    progress.stage-progress-bar::-webkit-progress-bar {
+      background: transparent;
+    }
+
+    progress.stage-progress-bar::-webkit-progress-value {
+      background: var(--progress-bar-fill);
+      border-radius: var(--progress-bar-radius);
+      transition: inline-size 0.35s ease;
+      animation: var(--progress-bar-animation, revert-rule);
+    }
+
+    progress.stage-progress-bar::-moz-progress-bar {
+      background: var(--progress-bar-fill);
+      border-radius: var(--progress-bar-radius);
+      transition: inline-size 0.35s ease;
+      animation: var(--progress-bar-animation, revert-rule);
+    }
+
+    @keyframes progress-bar-indeterminate {
+      from, to {
+        inline-size: var(--progress-bar-indeterminate-size);
+        margin-right: auto;
+      }
+      from { translate: -100%; }
+      to { translate: 100cqi; }
+    }
+
+    /* Stage HUD: flows below the slide on narrow containers so it never covers slide text,
+       and floats over the bottom corners on wider containers. */
+    .stage-hud {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: safe center;
+      justify-content: space-between;
+      gap: 0.5rem;
+      margin-block-start: 0.6rem;
+    }
+
+    .stage-hud:not(:has(> :not([hidden]))) {
+      display: none;
+    }
+
+    .floating-controls {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: safe center;
+      gap: 0.5rem;
+      margin-inline-start: auto;
+    }
+
+    .pass-dots {
+      display: flex;
+      flex-wrap: wrap;
+      flex-wrap: balance;
+      align-items: safe center;
+      gap: 0.4rem;
+    }
+
+    @container stage (inline-size >= 38rem) {
+      .stage-hud {
+        position: absolute;
+        inset-inline: 1rem;
+        inset-block-end: 1rem;
+        margin-block-start: 0;
+        pointer-events: none;
+        z-index: 5;
+      }
+
+      .pass-dots,
+      .floating-controls {
+        pointer-events: auto;
+      }
+    }
+
+    .pass-dot {
+      background: rgba(15, 23, 42, 0.78);
+      backdrop-filter: blur(8px);
+      border: 1px solid var(--border-strong);
+      color: var(--text-muted);
+      padding: 0.3rem 0.65rem;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .pass-dot.active {
+      color: #090a0f;
+      background: var(--accent);
+      border-color: var(--accent);
+    }
+
+    #toggle-orig-btn {
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: manipulation;
+    }
+
+    /* Multi-Slide Filmstrip */
+    html.is-dragging-slide,
+    html.is-dragging-slide * {
+      cursor: grabbing !important;
+    }
+
+    .slide-strip {
+      --drop-marker-color: var(--accent, #38bdf8);
+      --drop-line-size: 3px;
+      --drop-ring-size: 9px;
+      --strip-gap: 0.75rem;
+      --lifted-opacity: 0.96;
+      --lifted-shadow: 0 14px 28px rgba(0, 0, 0, 0.65), 0 0 0 2px var(--accent);
+      list-style: none;
+      margin: 0;
+      position: relative;
+      inline-size: 100%;
+      max-inline-size: 1280px;
+      display: flex;
+      align-items: center;
+      gap: var(--strip-gap);
+      overflow-x: auto;
+      scrollbar-gutter: stable;
+      overscroll-behavior-x: contain;
+      padding: 0.85rem;
+      scrollbar-width: thin;
+    }
+
+    @media (forced-colors: active) {
+      .slide-strip {
+        --drop-marker-color: Highlight;
+      }
+    }
+
+    .slide-strip[data-drop]::before,
+    .slide-strip[data-drop]::after {
+      content: "";
+      position: fixed;
+      pointer-events: none;
+      z-index: 30;
+    }
+
+    .slide-strip[data-drop]::before {
+      inline-size: var(--drop-ring-size);
+      block-size: var(--drop-ring-size);
+      border-radius: 50%;
+      border: 2px solid var(--drop-marker-color);
+      background: var(--bg);
+      inset-inline-start: calc(var(--drop-x) - var(--drop-ring-size) / 2);
+      inset-block-start: calc(var(--drop-y) - var(--drop-ring-size) + 1px);
+    }
+
+    .slide-strip[data-drop]::after {
+      inline-size: var(--drop-line-size);
+      block-size: var(--drop-h);
+      border-radius: 999px;
+      background: var(--drop-marker-color);
+      box-shadow: 0 0 10px var(--accent-glow);
+      inset-inline-start: calc(var(--drop-x) - var(--drop-line-size) / 2);
+      inset-block-start: var(--drop-y);
+    }
+
+    .strip-thumb {
+      position: relative;
+      flex: 0 0 clamp(112px, 24vw, 140px);
+      aspect-ratio: 16 / 9;
+      border-radius: 10px;
+      overflow: clip;
+      background: #050609;
+      border: 2px solid var(--border);
+      padding: 0;
+      scroll-margin: 0.85rem;
+      transition: border-color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .strip-thumb:last-child {
+      margin-inline-end: 0.85rem;
+    }
+
+    .strip-thumb:hover:not(.is-dragging, .is-grabbed) {
+      border-color: var(--border-strong);
+      transform: translateY(-1px);
+    }
+
+    .strip-thumb.active {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px var(--accent-glow);
+    }
+
+    .strip-thumb:has(.strip-handle:focus-visible) {
+      outline: 3px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    .strip-thumb.is-dragging,
+    .strip-thumb.is-grabbed {
+      position: relative;
+      z-index: 20;
+      opacity: var(--lifted-opacity);
+      transform: scale(1.03);
+      box-shadow: var(--lifted-shadow);
+      border-color: var(--accent);
+    }
+
+    .strip-thumb.is-dragging {
+      pointer-events: none;
+    }
+
+    .strip-select {
+      inline-size: 100%;
+      block-size: 100%;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      cursor: pointer;
+      display: block;
+    }
+
+    .strip-select:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: -2px;
+    }
+
+    .strip-thumb img {
+      inline-size: 100%;
+      block-size: 100%;
+      object-fit: cover;
+      display: block;
+      pointer-events: none;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+
+    .strip-handle {
+      position: absolute;
+      inset-block-start: 4px;
+      inset-inline-start: 4px;
+      z-index: 2;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      padding: 2px 7px;
+      border-radius: 999px;
+      background: rgba(9, 10, 15, 0.82);
+      color: var(--text);
+      border: 1px solid var(--border-strong);
+      font-size: 0.68rem;
+      font-weight: 700;
+      cursor: grab;
+      touch-action: none;
+      -webkit-user-select: none;
+      user-select: none;
+      opacity: 0.82;
+      outline: none;
+      transition: background 0.15s ease, opacity 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+    }
+
+    .strip-handle:is(:hover, :focus-visible) {
+      opacity: 1;
+      background: rgba(56, 189, 248, 0.28);
+      border-color: var(--accent);
+    }
+
+    .strip-handle[aria-pressed="true"] {
+      opacity: 1;
+      background: var(--accent);
+      color: #090a0f;
+      border-color: var(--accent);
+    }
+
+    .strip-handle svg {
+      inline-size: 10px;
+      block-size: 10px;
+      flex-shrink: 0;
+      opacity: 0.85;
+    }
+
+    .strip-key-hint {
+      position: absolute;
+      inset-inline: 4px;
+      inset-block-end: 4px;
+      z-index: 3;
+      background: rgba(9, 10, 15, 0.92);
+      color: var(--text);
+      font-size: 0.58rem;
+      font-weight: 600;
+      line-height: 1.2;
+      padding: 2px 5px;
+      border-radius: 6px;
+      border: 1px solid var(--border-strong);
+      text-align: center;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.15s ease;
+    }
+
+    .strip-thumb:has(.strip-handle:focus-visible) .strip-key-hint,
+    .strip-thumb.is-grabbed .strip-key-hint {
+      opacity: 1;
+    }
+
+    .strip-status {
+      position: absolute;
+      inset-block-end: 5px;
+      inset-inline-end: 5px;
+      inline-size: 18px;
+      block-size: 18px;
+      border-radius: 50%;
+      background: rgba(9, 10, 15, 0.85);
+      display: grid;
+      place-items: center;
+      font-size: 0.65rem;
+      color: var(--success);
+      border: 1px solid rgba(52, 211, 153, 0.4);
+      pointer-events: none;
+    }
+
+    .strip-status.running {
+      color: var(--accent);
+      border-color: rgba(56, 189, 248, 0.5);
+      animation: pulse-badge 1.2s ease-in-out infinite;
+    }
+
+    @keyframes pulse-badge {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.55; transform: scale(0.92); }
+    }
+
+    /* Streamlined Bottom Control Bar */
+    .control-bar-wrapper {
+      inline-size: 100%;
+      max-inline-size: 820px;
+      container: controlbar / inline-size;
+    }
+
+    .control-bar {
+      inline-size: 100%;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: safe center;
+      gap: 0.5rem;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 0.4rem 0.45rem 0.4rem 1.15rem;
+      backdrop-filter: blur(16px);
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+      transition: border-color 0.2s ease;
+    }
+
+    .control-bar:focus-within {
+      border-color: rgba(56, 189, 248, 0.5);
+    }
+
+    .control-bar input[type="text"] {
+      flex: 1 1 12rem;
+      min-inline-size: 0;
+      background: transparent;
+      border: 0;
+      color: var(--text);
+      font-size: 0.9rem;
+      font-family: inherit;
+      outline: none;
+      padding: 0.4rem 0;
+    }
+
+    @container controlbar (inline-size < 24rem) {
+      .control-bar {
+        border-radius: 18px;
+        padding: 0.55rem;
+      }
+
+      .control-bar input[type="text"] {
+        flex-basis: 100%;
+        padding-inline: 0.5rem;
+      }
+
+      .control-bar .btn {
+        inline-size: 100%;
+      }
+    }
+
+    .control-bar input[type="text"]::placeholder {
+      color: #64748b;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.45rem;
+      padding: 0.6rem 1.35rem;
+      border-radius: 999px;
+      font-weight: 600;
+      font-size: 0.88rem;
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: all 0.15s ease;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .btn:disabled,
+    .btn[aria-disabled="true"] {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .sr-only {
+      position: absolute;
+      inline-size: 1px;
+      block-size: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: clip;
+      clip-path: inset(50%);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #090a0f;
+      box-shadow: 0 0 20px rgba(56, 189, 248, 0.25);
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      background: #7dd3fc;
+      transform: translateY(-1px);
+    }
+
+    .btn-glass {
+      background: rgba(15, 23, 42, 0.78);
+      backdrop-filter: blur(8px);
+      color: var(--text);
+      border-color: var(--border-strong);
+      padding: 0.45rem 0.95rem;
+      font-size: 0.8rem;
+    }
+
+    .btn-glass:hover:not(:disabled) {
+      background: rgba(30, 41, 59, 0.9);
+      border-color: var(--accent);
+    }
+
+    /* Native <progress> Spinner (following modern-web-guidance `spinner`) */
+    @property --arc-start {
+      syntax: "<angle>";
+      inherits: false;
+      initial-value: 0deg;
+    }
+    @property --arc-end {
+      syntax: "<angle>";
+      inherits: false;
+      initial-value: 0deg;
+    }
+    @property --progress-dash-animation {
+      syntax: "*";
+      inherits: false;
+      initial-value: , progress-dash 3s ease-in-out infinite;
+    }
+
+    progress.loading-spinner:indeterminate::-webkit-progress-bar {
+      display: none;
+      background: none;
+    }
+    progress.loading-spinner:indeterminate::-webkit-progress-value {
+      display: none;
+      background: none;
+    }
+    progress.loading-spinner:indeterminate::-moz-progress-bar {
+      display: none;
+      background: none;
+    }
+    progress.loading-spinner:indeterminate::slider-fill {
+      display: none;
+      background: none;
+    }
+
+    progress.loading-spinner:indeterminate {
+      --_from: calc(90deg + var(--arc-start, 0deg));
+      --_to: calc(90deg + var(--arc-end, 158deg));
+      --size: 20px;
+      --thickness: 2.5px;
+      --spinner-color: #38bdf8;
+      --track-color: rgba(255, 255, 255, 0.15);
+      --spinner-duration: 1.4s;
+      --_used-spinner-duration: var(--spinner-duration);
+
+      position: relative;
+      width: var(--size);
+      height: var(--size);
+      border-radius: 50%;
+      appearance: none;
+      border: 0;
+      vertical-align: middle;
+
+      background: conic-gradient(
+          from var(--_from),
+          var(--spinner-color) calc(var(--_to) - var(--_from)),
+          transparent 0
+        )
+        var(--track-color);
+
+      @supports (background-clip: border-area) {
+        background-clip: border-area;
+        border: var(--thickness) solid transparent;
+        background-origin: border-box;
+      }
+
+      @supports not (background-clip: border-area) {
+        --clip-boundary: calc(100% - var(--thickness));
+        mask-image: radial-gradient(
+          farthest-side,
+          transparent var(--clip-boundary),
+          black var(--clip-boundary)
+        );
+        border: 0;
+      }
+
+      @media (forced-colors: active) {
+        forced-color-adjust: none;
+        --spinner-color: CanvasText;
+        --track-color: Canvas;
+      }
+
+      animation:
+        progress-spin var(--_used-spinner-duration) linear infinite
+        var(--progress-dash-animation, );
+    }
+
+    @keyframes progress-spin {
+      to { rotate: 1turn; }
+    }
+
+    @keyframes progress-dash {
+      from { --arc-start: 0deg; --arc-end: 3deg; }
+      50% { --arc-start: 100deg; --arc-end: 358deg; }
+      to { --arc-start: 360deg; --arc-end: 363deg; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      progress.loading-spinner:indeterminate {
+        --_used-spinner-duration: 6s;
+        --progress-dash-animation: ;
+        --arc-end: 158deg;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <img class="brand-mark" src="/logo.png" width="32" height="32" alt="" />
+      <span>FixSlidePic</span>
+    </div>
+
+    <div class="top-actions">
+      <button type="button" class="btn btn-glass" id="install-app" hidden>
+        Install app
+      </button>
+      <p id="install-status" class="sr-only" role="status"></p>
+      <button type="button" class="btn btn-glass" id="change-photo-btn" hidden>
+        Upload new photos
+      </button>
+      <a id="download-btn" class="btn btn-glass" download="restored-slide.png" href="#" hidden>
+        Download image
+      </a>
+      <a id="download-pdf-btn" class="btn btn-primary" download="restored-slides.pdf" href="#" hidden>
+        Download PDF
+      </a>
+    </div>
+  </header>
+
+  <div class="stage-wrapper">
+    <div class="stage empty" id="stage" tabindex="0" role="button" aria-label="Upload slide photographs">
+      <input type="file" id="file-input" accept="image/*" multiple />
+
+      <div class="upload-prompt" id="upload-prompt">
+        <div class="upload-icon">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+            <polyline points="17 8 12 3 7 8" />
+            <line x1="12" y1="3" x2="12" y2="15" />
+          </svg>
+        </div>
+        <strong>Drop one or more slide pictures here, or click to upload</strong>
+      </div>
+
+      <img id="stage-image" class="stage-image" alt="Slide view" hidden />
+
+      <div class="stage-overlay" id="stage-overlay" role="status" aria-live="polite" hidden>
+        <div class="progress-popup">
+          <div class="progress-hero">
+            <div class="progress-spinner-wrap">
+              <progress aria-label="Restoring slide" class="loading-spinner"></progress>
+              <div class="progress-spinner-icon" id="progress-spinner-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z" />
+                </svg>
+              </div>
+            </div>
+
+            <div class="progress-badges" id="progress-badges">
+              <span class="progress-badge" id="badge-pass">Pass 1 / 3</span>
+              <span class="progress-badge secondary" id="badge-batch" hidden>Slide 1 / 1</span>
+            </div>
+
+            <h2 class="progress-title" id="status-text">Restoring Slide...</h2>
+            <p class="progress-subtitle" id="status-subtitle">
+              Isolating slide canvas, rectifying perspective &amp; purifying surface colors
+            </p>
+          </div>
+
+          <div class="progress-steps" id="progress-steps" aria-hidden="true">
+            <div class="progress-step active" id="step-restore">
+              <div class="step-indicator" id="step-restore-ind">1</div>
+              <div class="step-meta">
+                <span class="step-label">Restore Slide</span>
+                <span class="step-desc" id="step-restore-desc">Generating 16:9 image...</span>
+              </div>
+            </div>
+            <div class="progress-step" id="step-verify">
+              <div class="step-indicator" id="step-verify-ind">2</div>
+              <div class="step-meta">
+                <span class="step-label">Verify Fidelity</span>
+                <span class="step-desc" id="step-verify-desc">LLM-as-a-Judge audit</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="progress-meter-group" id="progress-meter-group">
+            <div class="progress-meter-header">
+              <span id="progress-meter-label">Pass 1 of 3 · AI Image Restoration</span>
+              <span id="progress-meter-pct"></span>
+            </div>
+            <progress
+              id="stage-progress-bar"
+              class="stage-progress-bar"
+              aria-label="Slide restoration progress"
+              max="100"
+            ></progress>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="stage-hud">
+      <div class="pass-dots" id="pass-dots" hidden></div>
+
+      <div class="floating-controls" id="floating-controls" hidden>
+        <button type="button" class="btn btn-glass" id="toggle-orig-btn">
+          Hold to view original
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filmstrip shown when multiple slide photos are uploaded -->
+  <ol class="slide-strip" id="slide-strip" aria-label="Uploaded slides (drag or use handle to reorder)" hidden></ol>
+  <p id="reorder-status" class="sr-only" role="status" aria-live="polite"></p>
+
+  <div class="control-bar-wrapper">
+    <div class="control-bar">
+      <input
+        type="text"
+        id="initial-instructions"
+        placeholder="Optional instructions (e.g., keep dark theme, remove bottom banner...)"
+        aria-label="Optional instructions"
+      />
+      <button type="button" class="btn btn-primary" id="start-btn" disabled>
+        Restore
+      </button>
+    </div>
+  </div>
+
+  <script>
+    // Each item: { file, localPreviewUrl, sessionId, iterations: [], activeIterIdx: -1, status: 'pending'|'running'|'done' }
+    let slideItems = [];
+    let activeSlideIndex = 0;
+    let isBusy = false;
+    let customBusyMessage = '';
+
+    const stage = document.getElementById('stage');
+    const fileInput = document.getElementById('file-input');
+    const uploadPrompt = document.getElementById('upload-prompt');
+    const stageImage = document.getElementById('stage-image');
+    const stageOverlay = document.getElementById('stage-overlay');
+    const statusText = document.getElementById('status-text');
+    const statusSubtitle = document.getElementById('status-subtitle');
+    const progressSpinnerIcon = document.getElementById('progress-spinner-icon');
+    const badgePass = document.getElementById('badge-pass');
+    const badgeBatch = document.getElementById('badge-batch');
+    const progressSteps = document.getElementById('progress-steps');
+    const stepRestore = document.getElementById('step-restore');
+    const stepRestoreInd = document.getElementById('step-restore-ind');
+    const stepRestoreDesc = document.getElementById('step-restore-desc');
+    const stepVerify = document.getElementById('step-verify');
+    const stepVerifyInd = document.getElementById('step-verify-ind');
+    const stepVerifyDesc = document.getElementById('step-verify-desc');
+    const progressMeterLabel = document.getElementById('progress-meter-label');
+    const progressMeterPct = document.getElementById('progress-meter-pct');
+    const stageProgressBar = document.getElementById('stage-progress-bar');
+    const startBtn = document.getElementById('start-btn');
+    const changePhotoBtn = document.getElementById('change-photo-btn');
+    const downloadBtn = document.getElementById('download-btn');
+    const downloadPdfBtn = document.getElementById('download-pdf-btn');
+    const floatingControls = document.getElementById('floating-controls');
+    const toggleOrigBtn = document.getElementById('toggle-orig-btn');
+    const passDots = document.getElementById('pass-dots');
+    const slideStrip = document.getElementById('slide-strip');
+    const reorderStatus = document.getElementById('reorder-status');
+
+    const ICON_GRIP = `
+      <svg viewBox="0 0 10 14" fill="currentColor" aria-hidden="true">
+        <circle cx="3" cy="3" r="1.2" /><circle cx="7" cy="3" r="1.2" />
+        <circle cx="3" cy="7" r="1.2" /><circle cx="7" cy="7" r="1.2" />
+        <circle cx="3" cy="11" r="1.2" /><circle cx="7" cy="11" r="1.2" />
+      </svg>`;
+
+    const prefersReducedMotion = () =>
+      window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    let liveRegionTimer = null;
+    function announceReorder(message, delayMs = 40) {
+      if (!reorderStatus) return;
+      if (liveRegionTimer) clearTimeout(liveRegionTimer);
+      reorderStatus.textContent = '';
+      liveRegionTimer = setTimeout(() => {
+        reorderStatus.textContent = message;
+      }, delayMs);
+    }
+
+    const ICON_SPARKLES = `
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z" />
+      </svg>`;
+    const ICON_VERIFY = `
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+        <path d="m9 12 2 2 4-4" />
+      </svg>`;
+    const ICON_PDF = `
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+        <polyline points="14 2 14 8 20 8" />
+        <line x1="16" y1="13" x2="8" y2="13" />
+        <line x1="16" y1="17" x2="8" y2="17" />
+      </svg>`;
+
+    function getActiveItem() {
+      return slideItems[activeSlideIndex] || null;
+    }
+
+    function getLatestImageId(item) {
+      if (!item || !item.iterations || item.iterations.length === 0) return null;
+      const idx = item.activeIterIdx >= 0 ? item.activeIterIdx : item.iterations.length - 1;
+      const iter = item.iterations[idx];
+      return iter ? iter.imageId : null;
+    }
+
+    function getLatestGeneratedUrl(item) {
+      if (!item || !item.iterations || item.iterations.length === 0) return null;
+      const idx = item.activeIterIdx >= 0 ? item.activeIterIdx : item.iterations.length - 1;
+      const iter = item.iterations[idx];
+      return iter ? iter.generatedImageUrl : null;
+    }
+
+    const domNodeToItem = new WeakMap();
+    let dragGeneration = 0;
+    let activePointerDrag = null;
+    let activeKeyboardGrab = null;
+    let isMovingFocusGuard = false;
+
+    function moveDomItem(container, itemEl, referenceNode) {
+      if ('moveBefore' in Element.prototype) {
+        container.moveBefore(itemEl, referenceNode);
+        return true;
+      }
+      const hasActiveDrag = activePointerDrag && activePointerDrag.itemEl === itemEl;
+      if (hasActiveDrag) {
+        activePointerDrag.reestablishingCapture = true;
+      }
+      try {
+        if (referenceNode) {
+          referenceNode.before(itemEl);
+        } else {
+          container.append(itemEl);
+        }
+        if (hasActiveDrag && !activePointerDrag.handleEl.hasPointerCapture(activePointerDrag.pointerId)) {
+          try {
+            activePointerDrag.handleEl.setPointerCapture(activePointerDrag.pointerId);
+          } catch (_) {}
+        }
+      } finally {
+        if (hasActiveDrag) {
+          activePointerDrag.reestablishingCapture = false;
+        }
+      }
+      return false;
+    }
+
+    function syncSlideItemsFromDom(previouslyActiveItem) {
+      const orderedEls = Array.from(slideStrip.children);
+      slideItems = orderedEls.map(el => domNodeToItem.get(el)).filter(Boolean);
+      if (previouslyActiveItem) {
+        const newActiveIdx = slideItems.indexOf(previouslyActiveItem);
+        if (newActiveIdx >= 0) activeSlideIndex = newActiveIdx;
+      }
+      renderSlideStrip();
+      renderActiveSlideStage();
+    }
+
+    function recordChildrenRects() {
+      const rects = new Map();
+      Array.from(slideStrip.children).forEach(el => {
+        el.getAnimations().forEach(a => a.finish());
+        rects.set(el, el.getBoundingClientRect());
+      });
+      return rects;
+    }
+
+    function animateFlipChildren(beforeRects, releasedEl = null, releasedGen = 0) {
+      if (prefersReducedMotion()) {
+        if (releasedEl && (!activePointerDrag || activePointerDrag.itemEl !== releasedEl)) {
+          releasedEl.classList.remove('is-dragging');
+        }
+        return;
+      }
+      Array.from(slideStrip.children).forEach(el => {
+        const oldRect = beforeRects.get(el);
+        if (!oldRect) return;
+        const newRect = el.getBoundingClientRect();
+        const dx = oldRect.left - newRect.left;
+        const dy = oldRect.top - newRect.top;
+        if (Math.abs(dx) < 0.5 && Math.abs(dy) < 0.5) {
+          if (el === releasedEl && (!activePointerDrag || activePointerDrag.itemEl !== releasedEl)) {
+            releasedEl.classList.remove('is-dragging');
+          }
+          return;
+        }
+        const anim = el.animate(
+          [{ translate: `${dx}px ${dy}px` }, { translate: '0px 0px' }],
+          { duration: 220, easing: 'cubic-bezier(0.2, 0, 0, 1)' }
+        );
+        if (el === releasedEl) {
+          anim.addEventListener('finish', () => {
+            if (dragGeneration === releasedGen && (!activePointerDrag || activePointerDrag.itemEl !== releasedEl)) {
+              releasedEl.classList.remove('is-dragging');
+            }
+          });
+        }
+      });
+    }
+
+    function findDropReferenceNode(clientX) {
+      const stripRect = slideStrip.getBoundingClientRect();
+      const clampedX = Math.min(Math.max(clientX, stripRect.left), stripRect.right);
+      const pointerInStrip = clampedX - stripRect.left - slideStrip.clientLeft + slideStrip.scrollLeft;
+      const isRtl = getComputedStyle(slideStrip).direction === 'rtl';
+      const children = Array.from(slideStrip.children);
+      for (const child of children) {
+        const midpoint = child.offsetLeft + child.offsetWidth / 2;
+        if (isRtl ? pointerInStrip > midpoint : pointerInStrip < midpoint) {
+          return child;
+        }
+      }
+      return null;
+    }
+
+    function clearDropMarker() {
+      slideStrip.removeAttribute('data-drop');
+      slideStrip.style.removeProperty('--drop-x');
+      slideStrip.style.removeProperty('--drop-y');
+      slideStrip.style.removeProperty('--drop-w');
+      slideStrip.style.removeProperty('--drop-h');
+    }
+
+    function updateDropMarker(draggedEl, referenceNode) {
+      if (referenceNode === draggedEl || referenceNode === draggedEl.nextElementSibling) {
+        clearDropMarker();
+        return;
+      }
+      const isRtl = getComputedStyle(slideStrip).direction === 'rtl';
+      const nextItem = referenceNode;
+      const prevItem = referenceNode ? referenceNode.previousElementSibling : slideStrip.lastElementChild;
+      const gap = parseFloat(getComputedStyle(slideStrip).columnGap || getComputedStyle(slideStrip).gap) || 12;
+
+      let dropX = 0;
+      let dropY = 0;
+      let dropW = gap;
+      let dropH = 0;
+
+      if (prevItem && nextItem) {
+        const prevRect = prevItem.getBoundingClientRect();
+        const nextRect = nextItem.getBoundingClientRect();
+        dropX = isRtl ? (prevRect.left + nextRect.right) / 2 : (prevRect.right + nextRect.left) / 2;
+        dropY = nextRect.top;
+        dropH = nextRect.height;
+        dropW = Math.max(2, Math.abs(isRtl ? prevRect.left - nextRect.right : nextRect.left - prevRect.right));
+      } else if (nextItem) {
+        const nextRect = nextItem.getBoundingClientRect();
+        dropX = isRtl ? nextRect.right + gap / 2 : nextRect.left - gap / 2;
+        dropY = nextRect.top;
+        dropH = nextRect.height;
+      } else if (prevItem) {
+        const prevRect = prevItem.getBoundingClientRect();
+        dropX = isRtl ? prevRect.left - gap / 2 : prevRect.right + gap / 2;
+        dropY = prevRect.top;
+        dropH = prevRect.height;
+      } else {
+        clearDropMarker();
+        return;
+      }
+
+      slideStrip.setAttribute('data-drop', '');
+      slideStrip.style.setProperty('--drop-x', `${dropX}px`);
+      slideStrip.style.setProperty('--drop-y', `${dropY}px`);
+      slideStrip.style.setProperty('--drop-w', `${dropW}px`);
+      slideStrip.style.setProperty('--drop-h', `${dropH}px`);
+    }
+
+    function startPointerDrag(itemEl, handleEl, pointerId, startX, startY) {
+      if (activeKeyboardGrab) {
+        endKeyboardGrab(false);
+      }
+      const gen = ++dragGeneration;
+      itemEl.getAnimations().forEach(a => a.finish());
+      const startScrollLeft = slideStrip.scrollLeft;
+
+      activePointerDrag = {
+        gen,
+        itemEl,
+        handleEl,
+        pointerId,
+        startX,
+        startY,
+        lastClientX: startX,
+        lastClientY: startY,
+        startScrollLeft,
+        referenceNode: itemEl.nextElementSibling,
+        rafId: null,
+        lastFrameTime: performance.now(),
+        reestablishingCapture: false
+      };
+
+      document.documentElement.classList.add('is-dragging-slide');
+      itemEl.classList.add('is-dragging');
+      try {
+        handleEl.setPointerCapture(pointerId);
+      } catch (_) {}
+
+      const autoScrollTick = (now) => {
+        if (!activePointerDrag || activePointerDrag.gen !== gen) return;
+        const dt = Math.min(0.05, Math.max(0, (now - activePointerDrag.lastFrameTime) / 1000));
+        activePointerDrag.lastFrameTime = now;
+
+        const stripRect = slideStrip.getBoundingClientRect();
+        const zoneSize = Math.min(itemEl.offsetWidth, stripRect.width / 3);
+        const maxSpeed = 520; // px per second
+        let velocity = 0;
+
+        if (zoneSize > 0) {
+          const distFromLeft = activePointerDrag.lastClientX - stripRect.left;
+          const distFromRight = stripRect.right - activePointerDrag.lastClientX;
+          if (distFromLeft < zoneSize) {
+            const ratio = Math.min(2, (zoneSize - distFromLeft) / zoneSize);
+            velocity = -maxSpeed * ratio;
+          } else if (distFromRight < zoneSize) {
+            const ratio = Math.min(2, (zoneSize - distFromRight) / zoneSize);
+            velocity = maxSpeed * ratio;
+          }
+        }
+
+        if (velocity !== 0 && dt > 0) {
+          const prevScroll = slideStrip.scrollLeft;
+          slideStrip.scrollLeft += velocity * dt;
+          if (slideStrip.scrollLeft !== prevScroll) {
+            updateDraggedItemPosition();
+          }
+        }
+        activePointerDrag.rafId = requestAnimationFrame(autoScrollTick);
+      };
+
+      activePointerDrag.rafId = requestAnimationFrame(autoScrollTick);
+      document.addEventListener('pointermove', onDocumentPointerMove);
+      document.addEventListener('pointerup', onDocumentPointerUp);
+      document.addEventListener('pointercancel', onDocumentPointerCancel);
+      document.addEventListener('keydown', onDocumentDragKeyDown);
+    }
+
+    function updateDraggedItemPosition() {
+      if (!activePointerDrag) return;
+      const { itemEl, startX, startY, lastClientX, lastClientY, startScrollLeft } = activePointerDrag;
+      const scrollDelta = slideStrip.scrollLeft - startScrollLeft;
+      const dx = (lastClientX - startX) + scrollDelta;
+      const dy = (lastClientY - startY) * 0.22;
+      itemEl.style.translate = `${dx}px ${dy}px`;
+
+      const refNode = findDropReferenceNode(lastClientX);
+      activePointerDrag.referenceNode = refNode;
+      updateDropMarker(itemEl, refNode);
+    }
+
+    function cleanupPointerDragState() {
+      if (!activePointerDrag) return null;
+      const drag = activePointerDrag;
+      activePointerDrag = null;
+      if (drag.rafId) cancelAnimationFrame(drag.rafId);
+      clearDropMarker();
+      document.documentElement.classList.remove('is-dragging-slide');
+      document.removeEventListener('pointermove', onDocumentPointerMove);
+      document.removeEventListener('pointerup', onDocumentPointerUp);
+      document.removeEventListener('pointercancel', onDocumentPointerCancel);
+      document.removeEventListener('keydown', onDocumentDragKeyDown);
+      try {
+        if (drag.handleEl.hasPointerCapture(drag.pointerId)) {
+          drag.handleEl.releasePointerCapture(drag.pointerId);
+        }
+      } catch (_) {}
+      return drag;
+    }
+
+    function onDocumentPointerMove(e) {
+      if (!activePointerDrag || e.pointerId !== activePointerDrag.pointerId) return;
+      activePointerDrag.lastClientX = e.clientX;
+      activePointerDrag.lastClientY = e.clientY;
+      updateDraggedItemPosition();
+    }
+
+    function onDocumentPointerUp(e) {
+      if (!activePointerDrag || e.pointerId !== activePointerDrag.pointerId) return;
+      finishPointerDrag(false);
+    }
+
+    function onDocumentPointerCancel(e) {
+      if (!activePointerDrag || e.pointerId !== activePointerDrag.pointerId) return;
+      finishPointerDrag(true);
+    }
+
+    function onDocumentDragKeyDown(e) {
+      if (!activePointerDrag) return;
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        finishPointerDrag(true);
+      }
+    }
+
+    function finishPointerDrag(canceled) {
+      if (!activePointerDrag) return;
+      const { itemEl, handleEl, referenceNode, gen } = activePointerDrag;
+      const activeItem = getActiveItem();
+      const beforeRects = recordChildrenRects();
+
+      itemEl.style.translate = '';
+      const didMove = !canceled && referenceNode !== itemEl && referenceNode !== itemEl.nextElementSibling;
+      let usedMoveBefore = true;
+
+      if (didMove) {
+        isMovingFocusGuard = true;
+        usedMoveBefore = moveDomItem(slideStrip, itemEl, referenceNode);
+        isMovingFocusGuard = false;
+      }
+
+      cleanupPointerDragState();
+
+      if (canceled || didMove) {
+        itemEl.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+      }
+
+      if (didMove) {
+        syncSlideItemsFromDom(activeItem);
+        if (!usedMoveBefore) {
+          handleEl.focus({ preventScroll: true });
+        }
+        const newIdx = Array.from(slideStrip.children).indexOf(itemEl);
+        announceReorder(
+          `Slide moved to position ${newIdx + 1} of ${slideItems.length}.`,
+          usedMoveBefore ? 40 : 500
+        );
+      } else if (canceled) {
+        announceReorder('Reordering canceled.');
+      }
+
+      animateFlipChildren(beforeRects, itemEl, gen);
+    }
+
+    function startKeyboardGrab(itemEl, handleEl, hintEl) {
+      if (activeKeyboardGrab && activeKeyboardGrab.itemEl !== itemEl) {
+        endKeyboardGrab(false);
+      }
+      const children = Array.from(slideStrip.children);
+      const startIndex = children.indexOf(itemEl);
+      activeKeyboardGrab = {
+        itemEl,
+        handleEl,
+        hintEl,
+        startIndex
+      };
+      handleEl.setAttribute('aria-pressed', 'true');
+      itemEl.classList.add('is-grabbed');
+      hintEl.textContent = 'Arrows to move · Space to drop · Esc to cancel';
+      announceReorder(
+        `Slide ${startIndex + 1} grabbed. Use Left and Right arrow keys to move, Space or Enter to drop, Escape to cancel.`
+      );
+    }
+
+    function endKeyboardGrab(restoreOriginal) {
+      if (!activeKeyboardGrab) return;
+      const { itemEl, handleEl, hintEl, startIndex } = activeKeyboardGrab;
+      activeKeyboardGrab = null;
+      const activeItem = getActiveItem();
+      let currentIdx = Array.from(slideStrip.children).indexOf(itemEl);
+      let usedMoveBefore = true;
+
+      if (restoreOriginal && currentIdx !== startIndex && startIndex >= 0) {
+        const beforeRects = recordChildrenRects();
+        const childrenWithoutItem = Array.from(slideStrip.children).filter(el => el !== itemEl);
+        const refNode = childrenWithoutItem[startIndex] || null;
+        isMovingFocusGuard = true;
+        usedMoveBefore = moveDomItem(slideStrip, itemEl, refNode);
+        isMovingFocusGuard = false;
+        itemEl.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+        handleEl.focus({ preventScroll: true });
+        syncSlideItemsFromDom(activeItem);
+        animateFlipChildren(beforeRects);
+        currentIdx = startIndex;
+      }
+
+      handleEl.setAttribute('aria-pressed', 'false');
+      itemEl.classList.remove('is-grabbed');
+      hintEl.textContent = 'Space to reorder';
+
+      if (restoreOriginal) {
+        announceReorder(
+          `Reordering canceled. Slide returned to position ${startIndex + 1} of ${slideItems.length}.`,
+          usedMoveBefore ? 40 : 500
+        );
+      } else if (currentIdx !== startIndex) {
+        announceReorder(
+          `Slide dropped at position ${currentIdx + 1} of ${slideItems.length}.`,
+          40
+        );
+      }
+    }
+
+    function moveKeyboardGrabbedItem(directionKey) {
+      if (!activeKeyboardGrab) return;
+      const { itemEl, handleEl } = activeKeyboardGrab;
+      const isRtl = getComputedStyle(slideStrip).direction === 'rtl';
+      const moveEarlier = (directionKey === 'ArrowLeft' && !isRtl) || (directionKey === 'ArrowRight' && isRtl);
+
+      let referenceNode = null;
+      if (moveEarlier) {
+        const prev = itemEl.previousElementSibling;
+        if (!prev) return;
+        referenceNode = prev;
+      } else {
+        const next = itemEl.nextElementSibling;
+        if (!next) return;
+        referenceNode = next.nextElementSibling;
+      }
+
+      const activeItem = getActiveItem();
+      const beforeRects = recordChildrenRects();
+      isMovingFocusGuard = true;
+      const usedMoveBefore = moveDomItem(slideStrip, itemEl, referenceNode);
+      isMovingFocusGuard = false;
+
+      itemEl.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+      handleEl.focus({ preventScroll: true });
+      syncSlideItemsFromDom(activeItem);
+      animateFlipChildren(beforeRects);
+
+      const newIdx = Array.from(slideStrip.children).indexOf(itemEl);
+      const dirLabel = directionKey === 'ArrowLeft' ? 'left' : 'right';
+      announceReorder(
+        `Moved ${dirLabel} to position ${newIdx + 1} of ${slideItems.length}.`,
+        usedMoveBefore ? 40 : 500
+      );
+    }
+
+    slideStrip.addEventListener('focusin', (e) => {
+      if (!e.target.matches || !e.target.matches(':focus-visible')) return;
+      const itemEl = e.target.closest('.strip-thumb');
+      if (!itemEl) return;
+      if (itemEl.getAnimations().some(a => a.playState === 'running')) return;
+      itemEl.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+    });
+
+    function createStripThumbElement(item) {
+      const li = document.createElement('li');
+      li.className = 'strip-thumb';
+
+      const selectBtn = document.createElement('button');
+      selectBtn.type = 'button';
+      selectBtn.className = 'strip-select';
+
+      const img = document.createElement('img');
+      img.draggable = false;
+      selectBtn.appendChild(img);
+
+      const statusSpan = document.createElement('span');
+      statusSpan.className = 'strip-status';
+      statusSpan.hidden = true;
+      selectBtn.appendChild(statusSpan);
+
+      const handleBtn = document.createElement('button');
+      handleBtn.type = 'button';
+      handleBtn.className = 'strip-handle';
+      handleBtn.setAttribute('aria-pressed', 'false');
+      const badgeSpan = document.createElement('span');
+      badgeSpan.className = 'strip-badge-num';
+      handleBtn.innerHTML = ICON_GRIP;
+      handleBtn.appendChild(badgeSpan);
+
+      const keyHint = document.createElement('span');
+      keyHint.className = 'strip-key-hint';
+      keyHint.setAttribute('aria-hidden', 'true');
+      keyHint.textContent = 'Space to reorder';
+
+      li.appendChild(selectBtn);
+      li.appendChild(handleBtn);
+      li.appendChild(keyHint);
+
+      item.domRefs = { li, selectBtn, img, statusSpan, handleBtn, badgeSpan, keyHint };
+      domNodeToItem.set(li, item);
+
+      let suppressNextSelectClick = false;
+
+      selectBtn.addEventListener('click', () => {
+        if (suppressNextSelectClick) {
+          suppressNextSelectClick = false;
+          return;
+        }
+        const idx = slideItems.indexOf(item);
+        if (idx >= 0) {
+          activeSlideIndex = idx;
+          renderSlideStrip();
+          renderActiveSlideStage();
+        }
+      });
+
+      // Allow mouse users to press and drag anywhere on the thumbnail (after 4px threshold)
+      selectBtn.addEventListener('pointerdown', (e) => {
+        if (e.button !== 0 || e.pointerType !== 'mouse' || activePointerDrag) return;
+        const startX = e.clientX;
+        const startY = e.clientY;
+        const pointerId = e.pointerId;
+
+        const onMove = (moveEvt) => {
+          if (moveEvt.pointerId !== pointerId) return;
+          if (Math.hypot(moveEvt.clientX - startX, moveEvt.clientY - startY) > 4) {
+            cleanupPending();
+            suppressNextSelectClick = true;
+            startPointerDrag(li, handleBtn, pointerId, startX, startY);
+            activePointerDrag.lastClientX = moveEvt.clientX;
+            activePointerDrag.lastClientY = moveEvt.clientY;
+            updateDraggedItemPosition();
+          }
+        };
+        const cleanupPending = () => {
+          document.removeEventListener('pointermove', onMove);
+          document.removeEventListener('pointerup', cleanupPending);
+          document.removeEventListener('pointercancel', cleanupPending);
+        };
+        document.addEventListener('pointermove', onMove);
+        document.addEventListener('pointerup', cleanupPending);
+        document.addEventListener('pointercancel', cleanupPending);
+      });
+
+      handleBtn.addEventListener('pointerdown', (e) => {
+        if (e.button !== 0) return;
+        if (activePointerDrag) return;
+        e.stopPropagation();
+        startPointerDrag(li, handleBtn, e.pointerId, e.clientX, e.clientY);
+      });
+
+      handleBtn.addEventListener('lostpointercapture', (e) => {
+        if (!activePointerDrag || activePointerDrag.handleEl !== handleBtn || activePointerDrag.pointerId !== e.pointerId) {
+          return;
+        }
+        if (activePointerDrag.reestablishingCapture) return;
+        finishPointerDrag(false);
+      });
+
+      handleBtn.addEventListener('keydown', (e) => {
+        const isGrabbed = handleBtn.getAttribute('aria-pressed') === 'true';
+        if (e.key === ' ' || e.key === 'Enter') {
+          e.preventDefault();
+          if (isGrabbed) {
+            endKeyboardGrab(false);
+          } else {
+            startKeyboardGrab(li, handleBtn, keyHint);
+          }
+        } else if (isGrabbed && (e.key === 'ArrowLeft' || e.key === 'ArrowRight')) {
+          e.preventDefault();
+          moveKeyboardGrabbedItem(e.key);
+        } else if (isGrabbed && e.key === 'Escape') {
+          e.preventDefault();
+          endKeyboardGrab(true);
+        }
+      });
+
+      handleBtn.addEventListener('blur', () => {
+        if (isMovingFocusGuard) return;
+        if (activeKeyboardGrab && activeKeyboardGrab.handleEl === handleBtn) {
+          endKeyboardGrab(false);
+        }
+      });
+
+      return li;
+    }
+
+    function selectUploadedFiles(fileList) {
+      const files = Array.from(fileList).filter(f => f.type.startsWith('image/') || /\.(jpe?g|png|webp)$/i.test(f.name));
+      if (files.length === 0) return;
+
+      if (activePointerDrag) cleanupPointerDragState();
+      if (activeKeyboardGrab) endKeyboardGrab(false);
+
+      slideItems.forEach(it => {
+        if (it.localPreviewUrl) URL.revokeObjectURL(it.localPreviewUrl);
+      });
+
+      slideItems = files.map(file => ({
+        file,
+        localPreviewUrl: URL.createObjectURL(file),
+        sessionId: null,
+        iterations: [],
+        activeIterIdx: -1,
+        status: 'pending',
+        phase: 'starting',
+        currentPass: 1,
+        maxPasses: 3,
+        lastScore: null,
+        statusMessage: '',
+        domRefs: null
+      }));
+      activeSlideIndex = 0;
+
+      slideStrip.innerHTML = '';
+      if (slideItems.length > 1) {
+        slideItems.forEach(item => {
+          slideStrip.appendChild(createStripThumbElement(item));
+        });
+      }
+
+      stage.classList.remove('empty');
+      stage.removeAttribute('role');
+      stage.removeAttribute('tabindex');
+      uploadPrompt.hidden = true;
+
+      changePhotoBtn.hidden = false;
+      downloadPdfBtn.hidden = true;
+      startBtn.disabled = isBusy;
+
+      renderSlideStrip();
+      renderActiveSlideStage();
+    }
+
+    function renderSlideStrip() {
+      if (slideItems.length <= 1) {
+        slideStrip.hidden = true;
+        return;
+      }
+      slideStrip.hidden = false;
+
+      slideItems.forEach((item, idx) => {
+        if (!item.domRefs) {
+          slideStrip.appendChild(createStripThumbElement(item));
+        }
+        const { li, selectBtn, img, statusSpan, handleBtn, badgeSpan } = item.domRefs;
+        li.classList.toggle('active', idx === activeSlideIndex);
+        li.dataset.slideIndex = String(idx);
+
+        const thumbUrl = getLatestGeneratedUrl(item) || item.localPreviewUrl;
+        if (img.getAttribute('src') !== thumbUrl) {
+          img.src = thumbUrl;
+        }
+        img.alt = `Slide ${idx + 1}`;
+        selectBtn.setAttribute('aria-label', `Select slide ${idx + 1}`);
+        badgeSpan.textContent = String(idx + 1);
+        handleBtn.setAttribute('aria-label', `Reorder slide ${idx + 1}`);
+
+        if (item.status === 'done') {
+          statusSpan.hidden = false;
+          statusSpan.className = 'strip-status';
+          statusSpan.title = 'Restored';
+          statusSpan.textContent = '✓';
+        } else if (item.status === 'running') {
+          statusSpan.hidden = false;
+          statusSpan.className = 'strip-status running';
+          statusSpan.title = 'Restoring...';
+          statusSpan.textContent = '●';
+        } else {
+          statusSpan.hidden = true;
+          statusSpan.textContent = '';
+        }
+      });
+    }
+
+    function renderActiveSlideStage() {
+      const item = getActiveItem();
+      if (!item) return;
+
+      const genUrl = getLatestGeneratedUrl(item);
+      if (genUrl) {
+        stageImage.src = genUrl;
+        stageImage.hidden = false;
+        downloadBtn.href = genUrl;
+        downloadBtn.hidden = false;
+        floatingControls.hidden = false;
+      } else {
+        stageImage.src = item.localPreviewUrl;
+        stageImage.hidden = false;
+        downloadBtn.hidden = true;
+        floatingControls.hidden = true;
+      }
+
+      if (item.iterations.length > 1) {
+        passDots.hidden = false;
+        passDots.innerHTML = '';
+        item.iterations.forEach((it, idx) => {
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'pass-dot' + (idx === item.activeIterIdx ? ' active' : '');
+          btn.textContent = `Pass ${idx + 1}`;
+          btn.addEventListener('click', () => {
+            item.activeIterIdx = idx;
+            renderActiveSlideStage();
+            renderSlideStrip();
+            updatePdfButton();
+          });
+          passDots.appendChild(btn);
+        });
+      } else {
+        passDots.hidden = true;
+      }
+
+      updatePdfButton();
+      syncStageBusyOverlay();
+    }
+
+    function updatePdfButton() {
+      if (slideItems.length <= 1) {
+        downloadPdfBtn.hidden = true;
+        return null;
+      }
+      const ids = slideItems.map(getLatestImageId).filter(Boolean);
+      if (ids.length === slideItems.length) {
+        const pdfUrl = `/api/slides/pdf?ids=${encodeURIComponent(ids.join(','))}`;
+        downloadPdfBtn.href = pdfUrl;
+        downloadPdfBtn.textContent = `Download PDF (${ids.length} slides)`;
+        downloadPdfBtn.hidden = false;
+        return pdfUrl;
+      } else {
+        downloadPdfBtn.hidden = true;
+        return null;
+      }
+    }
+
+    stage.addEventListener('click', (e) => {
+      if (slideItems.length === 0 && e.target === stage) {
+        fileInput.click();
+      }
+    });
+    stage.addEventListener('keydown', (e) => {
+      if (slideItems.length === 0 && (e.key === 'Enter' || e.key === ' ')) {
+        e.preventDefault();
+        fileInput.click();
+      }
+    });
+    changePhotoBtn.addEventListener('click', () => fileInput.click());
+
+    fileInput.addEventListener('change', () => {
+      if (fileInput.files.length > 0) selectUploadedFiles(fileInput.files);
+    });
+
+    window.addEventListener('dragover', (e) => {
+      if (e.dataTransfer && Array.from(e.dataTransfer.types || []).includes('Files')) {
+        e.preventDefault();
+        stage.classList.add('dragover');
+      }
+    });
+    window.addEventListener('dragleave', (e) => {
+      if (e.relatedTarget === null) stage.classList.remove('dragover');
+    });
+    window.addEventListener('drop', (e) => {
+      e.preventDefault();
+      stage.classList.remove('dragover');
+      if (e.dataTransfer.files.length > 0) selectUploadedFiles(e.dataTransfer.files);
+    });
+
+    // Hold to peek at original photo
+    const showOrig = () => {
+      const item = getActiveItem();
+      if (item && item.localPreviewUrl && getLatestGeneratedUrl(item)) {
+        stageImage.src = item.localPreviewUrl;
+      }
+    };
+    const showRestored = () => {
+      const item = getActiveItem();
+      const genUrl = getLatestGeneratedUrl(item);
+      if (genUrl) {
+        stageImage.src = genUrl;
+      }
+    };
+    toggleOrigBtn.addEventListener('pointerdown', showOrig);
+    toggleOrigBtn.addEventListener('pointerup', showRestored);
+    toggleOrigBtn.addEventListener('pointerleave', showRestored);
+    toggleOrigBtn.addEventListener('pointercancel', showRestored);
+    toggleOrigBtn.addEventListener('contextmenu', (e) => e.preventDefault());
+
+    function setBusy(busy, message) {
+      isBusy = busy;
+      customBusyMessage = message || '';
+      startBtn.disabled = busy || slideItems.length === 0;
+      changePhotoBtn.disabled = busy;
+      if (!busy) {
+        stage.classList.remove('busy');
+        stageOverlay.hidden = true;
+      } else {
+        syncStageBusyOverlay();
+      }
+    }
+
+    function syncStageBusyOverlay() {
+      const doneCount = slideItems.filter(it => it.status === 'done').length;
+      const runningCount = slideItems.filter(it => it.status === 'running').length;
+      const anyRunning = isBusy || runningCount > 0;
+
+      if (!anyRunning) {
+        stage.classList.remove('busy');
+        stageOverlay.hidden = true;
+        return;
+      }
+
+      if (customBusyMessage) {
+        stage.classList.add('busy');
+        stageOverlay.hidden = false;
+        progressSpinnerIcon.innerHTML = ICON_PDF;
+        badgePass.textContent = 'PDF Export';
+        if (slideItems.length > 1) {
+          badgeBatch.hidden = false;
+          badgeBatch.textContent = `${slideItems.length} Slides Ready`;
+        } else {
+          badgeBatch.hidden = true;
+        }
+        statusText.textContent = customBusyMessage;
+        statusSubtitle.textContent = 'Combining all restored 16:9 slides into a high-resolution PDF document...';
+        progressSteps.hidden = true;
+        progressMeterLabel.textContent = 'Building PDF presentation deck';
+        progressMeterPct.textContent = '100%';
+        stageProgressBar.value = 100;
+        return;
+      }
+
+      const activeItem = getActiveItem();
+      const firstRunningItem = slideItems.find(it => it.status === 'running');
+      const trackedItem = (activeItem && activeItem.status === 'running')
+        ? activeItem
+        : (firstRunningItem || activeItem);
+      const trackedIndex = trackedItem ? Math.max(0, slideItems.indexOf(trackedItem)) : activeSlideIndex;
+
+      stage.classList.add('busy');
+      stageOverlay.hidden = false;
+      progressSteps.hidden = false;
+
+      const pass = (trackedItem && trackedItem.currentPass) || 1;
+      const maxPasses = (trackedItem && trackedItem.maxPasses) || 3;
+      const phase = (trackedItem && trackedItem.phase) || 'fixing';
+
+      if (slideItems.length > 1) {
+        badgeBatch.hidden = false;
+        badgeBatch.textContent = `Slide ${activeSlideIndex + 1} / ${slideItems.length} · ${doneCount}/${slideItems.length} done${runningCount > 0 ? `, ${runningCount} active` : ''}`;
+      } else {
+        badgeBatch.hidden = true;
+      }
+
+      if (activeItem && activeItem.status === 'done' && slideItems.length > 1) {
+        badgePass.textContent = `Slide ${activeSlideIndex + 1} ✓ Done · Slide ${trackedIndex + 1} Pass ${pass}/${maxPasses}`;
+      } else if (activeItem && activeItem.status === 'pending' && firstRunningItem && slideItems.length > 1) {
+        badgePass.textContent = `Slide ${activeSlideIndex + 1} Queued · Slide ${trackedIndex + 1} Pass ${pass}/${maxPasses}`;
+      } else {
+        badgePass.textContent = `Pass ${pass} / ${maxPasses}${pass > 1 ? ' · Refining' : ''}`;
+      }
+
+      if (phase === 'judging') {
+        progressSpinnerIcon.innerHTML = ICON_VERIFY;
+        statusText.textContent = (activeItem && activeItem.status !== 'running' && slideItems.length > 1)
+          ? `Slide ${trackedIndex + 1}: Verifying Fidelity...`
+          : 'Verifying Fidelity...';
+        statusSubtitle.textContent = (activeItem && activeItem.status === 'done' && slideItems.length > 1)
+          ? `Slide ${activeSlideIndex + 1} is already restored — auditing Slide ${trackedIndex + 1} while ${runningCount} slide${runningCount === 1 ? ' is' : 's are'} active`
+          : (activeItem && activeItem.status === 'pending' && slideItems.length > 1)
+            ? `Slide ${activeSlideIndex + 1} is queued next — currently auditing Slide ${trackedIndex + 1} (${runningCount} active in parallel)`
+            : 'Auditing text accuracy, perspective geometry & theme preservation against the original photo';
+        stepRestore.className = 'progress-step done';
+        stepRestoreInd.textContent = '✓';
+        stepRestoreDesc.textContent = '16:9 slide generated';
+        stepVerify.className = 'progress-step active';
+        stepVerifyInd.textContent = '2';
+        stepVerifyDesc.textContent = 'Auditing quality...';
+      } else {
+        progressSpinnerIcon.innerHTML = ICON_SPARKLES;
+        const baseTitle = pass > 1 ? `Refining Slide (Pass ${pass})...` : 'Restoring Slide...';
+        statusText.textContent = (activeItem && activeItem.status !== 'running' && slideItems.length > 1)
+          ? `Slide ${trackedIndex + 1}: ${baseTitle}`
+          : baseTitle;
+        statusSubtitle.textContent = (activeItem && activeItem.status === 'done' && slideItems.length > 1)
+          ? `Slide ${activeSlideIndex + 1} is already restored — still processing remaining slides (${doneCount}/${slideItems.length} done, ${runningCount} active)`
+          : (activeItem && activeItem.status === 'pending' && slideItems.length > 1)
+            ? `Slide ${activeSlideIndex + 1} is queued — currently restoring ${runningCount} slide${runningCount === 1 ? '' : 's'} in parallel`
+            : (pass > 1 && trackedItem && trackedItem.lastScore != null)
+              ? `Applying Judge feedback to improve fidelity (Pass ${pass - 1} scored ${trackedItem.lastScore}/10)`
+              : 'Isolating slide canvas, rectifying 3D perspective & purifying surface colors';
+        stepRestore.className = 'progress-step active';
+        stepRestoreInd.textContent = '1';
+        stepRestoreDesc.textContent = pass > 1 ? 'Applying refinements...' : 'Generating 16:9 slide...';
+        stepVerify.className = 'progress-step';
+        stepVerifyInd.textContent = '2';
+        stepVerifyDesc.textContent = 'LLM-as-a-Judge audit';
+      }
+
+      if (slideItems.length > 1) {
+        const itemContribution = slideItems.reduce((acc, it) => {
+          if (it.status === 'done') return acc + 1;
+          if (it.status === 'running') {
+            return acc + (it.phase === 'judging' ? 0.72 : 0.38);
+          }
+          return acc;
+        }, 0);
+        const pct = Math.min(96, Math.max(8, Math.round((itemContribution / slideItems.length) * 100)));
+        progressMeterLabel.textContent = `Batch Progress · ${doneCount} of ${slideItems.length} slides completed${runningCount > 0 ? ` (${runningCount} active)` : ''}`;
+        progressMeterPct.textContent = `${pct}%`;
+        stageProgressBar.value = pct;
+      } else {
+        const pct = phase === 'judging' ? 78 : 42;
+        progressMeterLabel.textContent = `Pass ${pass} of ${maxPasses} · ${phase === 'judging' ? 'Step 2/2: Fidelity Verification' : 'Step 1/2: AI Image Restoration'}`;
+        progressMeterPct.textContent = `${pct}%`;
+        stageProgressBar.value = pct;
+      }
+    }
+
+    async function consumeSseStreamForItem(item, response) {
+      if (!response.ok || !response.body) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = '';
+      let state = { unknownSessionError: false };
+
+      while (true) {
+        const { value, done } = await reader.read();
+        if (done) break;
+        buffer += decoder.decode(value, { stream: true });
+        const parts = buffer.split('\n\n');
+        buffer = parts.pop();
+
+        for (const block of parts) {
+          const dataLine = block.split('\n').find(l => l.startsWith('data:'));
+          if (!dataLine) continue;
+          const jsonStr = dataLine.slice(5).trim();
+          if (!jsonStr) continue;
+          const evt = JSON.parse(jsonStr);
+          if (evt.type === 'ERROR' && evt.message && evt.message.includes('Unknown sessionId')) {
+            state.unknownSessionError = true;
+            continue;
+          }
+          handleItemProgressEvent(item, evt);
+        }
+      }
+      return state;
+    }
+
+    function handleItemProgressEvent(item, evt) {
+      const slideIndex = Math.max(0, slideItems.indexOf(item));
+      const totalSlides = slideItems.length;
+      const prefix = totalSlides > 1 ? `Slide ${slideIndex + 1}/${totalSlides} · ` : '';
+      if (evt.sessionId) item.sessionId = evt.sessionId;
+      if (evt.maxIterations) item.maxPasses = evt.maxIterations;
+
+      if (evt.type === 'SESSION_STARTED') {
+        item.phase = 'fixing';
+        item.currentPass = 1;
+        item.statusMessage = `${prefix}Restoring slide...`;
+      } else if (evt.type === 'FIXER_STARTED') {
+        item.phase = 'fixing';
+        item.currentPass = evt.iteration || 1;
+        item.statusMessage = `${prefix}Pass ${evt.iteration}/${evt.maxIterations} · Restoring slide...`;
+      } else if (evt.type === 'FIXER_COMPLETED') {
+        if (evt.iterationResult) {
+          const existingIdx = item.iterations.findIndex(
+            i => i.runNumber === evt.iterationResult.runNumber && i.iteration === evt.iterationResult.iteration
+          );
+          if (existingIdx >= 0) {
+            item.iterations[existingIdx] = evt.iterationResult;
+            item.activeIterIdx = existingIdx;
+          } else {
+            item.iterations.push(evt.iterationResult);
+            item.activeIterIdx = item.iterations.length - 1;
+          }
+        }
+        item.phase = 'judging';
+        item.currentPass = evt.iteration || item.currentPass;
+        item.statusMessage = `${prefix}Pass ${evt.iteration}/${evt.maxIterations} · Verifying fidelity...`;
+      } else if (evt.type === 'JUDGE_STARTED') {
+        item.phase = 'judging';
+        item.currentPass = evt.iteration || item.currentPass;
+        item.statusMessage = `${prefix}Pass ${evt.iteration}/${evt.maxIterations} · Verifying fidelity...`;
+      } else if (evt.type === 'JUDGE_COMPLETED' || evt.type === 'LOOP_FINISHED') {
+        if (evt.iterationResult && evt.iterationResult.verdict) {
+          item.lastScore = evt.iterationResult.verdict.overallScore;
+        }
+        if (evt.sessionResult && evt.sessionResult.iterations) {
+          item.iterations = evt.sessionResult.iterations;
+          item.activeIterIdx = item.iterations.length - 1;
+        }
+        if (evt.type === 'LOOP_FINISHED') {
+          item.status = 'done';
+          item.phase = 'done';
+          item.statusMessage = `${prefix}Restored`;
+        }
+      } else if (evt.type === 'ERROR') {
+        item.status = item.iterations.length > 0 ? 'done' : 'pending';
+        alert(evt.message || 'An error occurred while restoring the slide.');
+      }
+
+      renderSlideStrip();
+      renderActiveSlideStage();
+    }
+
+    async function runFreshFixStream(item, instructions) {
+      const formData = new FormData();
+      formData.append('file', item.file);
+      if (instructions) formData.append('instructions', instructions);
+
+      const res = await fetch('/api/slides/fix-stream', {
+        method: 'POST',
+        body: formData
+      });
+      await consumeSseStreamForItem(item, res);
+    }
+
+    async function restoreSingleItem(item, instructions) {
+      const slideIndex = Math.max(0, slideItems.indexOf(item));
+      const totalSlides = slideItems.length;
+      const prefix = totalSlides > 1 ? `Slide ${slideIndex + 1}/${totalSlides} · ` : '';
+      item.status = 'running';
+      item.phase = 'fixing';
+      item.currentPass = 1;
+      item.lastScore = null;
+      item.statusMessage = `${prefix}Restoring slide...`;
+      renderSlideStrip();
+      renderActiveSlideStage();
+
+      try {
+        if (item.sessionId) {
+          try {
+            const res = await fetch(`/api/slides/sessions/${encodeURIComponent(item.sessionId)}/regenerate-stream`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ instructions })
+            });
+            const streamState = await consumeSseStreamForItem(item, res);
+            if (streamState && streamState.unknownSessionError && item.file) {
+              item.sessionId = null;
+              await runFreshFixStream(item, instructions);
+            }
+            return;
+          } catch (regenErr) {
+            if (item.file) {
+              item.sessionId = null;
+              await runFreshFixStream(item, instructions);
+              return;
+            }
+            throw regenErr;
+          }
+        }
+
+        await runFreshFixStream(item, instructions);
+      } finally {
+        if (item.status === 'running') {
+          item.status = item.iterations.length > 0 ? 'done' : 'pending';
+        }
+        renderSlideStrip();
+        renderActiveSlideStage();
+      }
+    }
+
+    const MAX_CONCURRENCY = 4;
+
+    async function triggerRestore() {
+      if (slideItems.length === 0 || isBusy) return;
+      const instructions = document.getElementById('initial-instructions').value.trim();
+
+      setBusy(true);
+      try {
+        const pendingItems = slideItems.filter(it => it.status !== 'done');
+
+        if (pendingItems.length > 0) {
+          // Restore up to MAX_CONCURRENCY (4) slides in parallel
+          let cursor = 0;
+          const workerCount = Math.min(MAX_CONCURRENCY, pendingItems.length);
+          const workers = Array.from({ length: workerCount }, async () => {
+            while (cursor < pendingItems.length) {
+              const item = pendingItems[cursor++];
+              try {
+                await restoreSingleItem(item, instructions);
+              } catch (itemErr) {
+                console.error('Error restoring slide item:', itemErr);
+              }
+            }
+          });
+          await Promise.all(workers);
+
+          // If multiple images were uploaded at once, automatically create & trigger the PDF download
+          if (slideItems.length > 1) {
+            const completedCount = slideItems.filter(it => getLatestImageId(it)).length;
+            if (completedCount === slideItems.length) {
+              setBusy(true, 'Creating PDF with all restored slides...');
+              const pdfUrl = updatePdfButton();
+              if (pdfUrl) {
+                downloadPdfBtn.click();
+              }
+            }
+          }
+        } else {
+          // All slides were already restored; re-restore the currently active slide
+          await restoreSingleItem(slideItems[activeSlideIndex], instructions);
+          updatePdfButton();
+        }
+      } catch (e) {
+        console.error('Error restoring slides:', e);
+      } finally {
+        setBusy(false, '');
+      }
+    }
+
+    startBtn.addEventListener('click', triggerRestore);
+    document.getElementById('initial-instructions').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        triggerRestore();
+      }
+    });
+
+    // Progressive Web App: Web Install API (`navigator.install()`) with `beforeinstallprompt` fallback
+    const installButton = document.querySelector('#install-app');
+    const installStatus = document.querySelector('#install-status');
+    const supportsWebInstall = typeof Navigator.prototype.install === 'function';
+    let deferredInstallPrompt;
+
+    if (supportsWebInstall) {
+      installButton.hidden = false;
+    }
+
+    window.addEventListener('beforeinstallprompt', (event) => {
+      event.preventDefault();
+      deferredInstallPrompt = event;
+
+      if (!supportsWebInstall) {
+        installButton.hidden = false;
+      }
+    });
+
+    window.addEventListener('appinstalled', () => {
+      deferredInstallPrompt = undefined;
+      installButton.hidden = true;
+      installStatus.textContent = 'The app was installed.';
+    });
+
+    installButton.addEventListener('click', async () => {
+      if (installButton.getAttribute('aria-disabled') === 'true') {
+        return;
+      }
+      installButton.setAttribute('aria-disabled', 'true');
+
+      try {
+        if (supportsWebInstall) {
+          await navigator.install();
+          installStatus.textContent = 'The app was installed or opened.';
+          installButton.hidden = true;
+        } else if (deferredInstallPrompt) {
+          const promptEvent = deferredInstallPrompt;
+          deferredInstallPrompt = undefined;
+          await promptEvent.prompt();
+          const { outcome } = await promptEvent.userChoice;
+
+          installStatus.textContent =
+            outcome === 'accepted'
+              ? 'The app was installed.'
+              : 'Installation canceled.';
+          if (!deferredInstallPrompt) {
+            installButton.hidden = true;
+          }
+        }
+      } catch (error) {
+        if (error.name === 'AbortError') {
+          installStatus.textContent = 'Installation was canceled or could not complete.';
+        } else {
+          installStatus.textContent = 'Installation could not start.';
+          console.error(error);
+        }
+      } finally {
+        installButton.removeAttribute('aria-disabled');
+      }
+    });
+
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js').catch((err) => {
+          console.error('Service worker registration failed:', err);
+        });
+      });
+    }
+  </script>
+</body>
+</html>
