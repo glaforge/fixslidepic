@@ -59,6 +59,11 @@ micronaut {
     }
 }
 
+tasks.named("shadowJar") {
+    zip64 = true
+    mergeServiceFiles()
+}
+
 tasks.withType(AbstractTestTask).configureEach {
     failOnNoDiscoveredTests = false
 }

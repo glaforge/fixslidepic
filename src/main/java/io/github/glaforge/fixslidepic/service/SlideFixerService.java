@@ -167,7 +167,12 @@ public class SlideFixerService {
     void init() throws IOException {
         this.outputDir = Path.of(outputDirPath).toAbsolutePath().normalize();
         this.testPicturesDir = Path.of(testPicturesDirPath).toAbsolutePath().normalize();
-        Files.createDirectories(this.outputDir);
+        try {
+            Files.createDirectories(this.outputDir);
+        } catch (IOException e) {
+            this.outputDir = Path.of(System.getProperty("java.io.tmpdir", "/tmp"), "generated-slides").toAbsolutePath().normalize();
+            Files.createDirectories(this.outputDir);
+        }
         LOG.info("SlideFixerService initialized with imageModel={}, judgeModel={}, maxIterations={}, outputDir={}",
                 imageModel, judgeModel, maxIterations, outputDir);
     }
